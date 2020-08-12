@@ -1,0 +1,108 @@
+package main;
+
+import com.google.gson.internal.LinkedTreeMap;
+import org.openapitools.client.ApiClient;
+import org.openapitools.client.ApiException;
+import org.openapitools.client.Configuration;
+import org.openapitools.client.api.AccountManagementApi;
+import org.openapitools.client.api.TradingApi;
+import org.openapitools.client.api.WalletApi;
+import org.openapitools.client.auth.HttpBasicAuth;
+
+import java.util.ArrayList;
+
+public class ApiController {
+
+    private ApiClient defaultClient;
+
+    private TradingApi tradingApi;
+    private AccountManagementApi accountManagementApi;
+    private WalletApi walletApi;
+
+    public enum CURRENCY{
+        BTC,
+        ETH
+    }
+
+    public enum INSTRUMENT {
+        option,
+        future
+    }
+
+    public enum SETTLEMENT {
+        settlement,
+        delivery,
+        bankruptcy
+    }
+
+    public ApiController(){
+        defaultClient = Configuration.getDefaultApiClient();
+    }
+
+    public boolean autheticate(Credentials creds){
+        try{
+            HttpBasicAuth bearerAuth = (HttpBasicAuth) defaultClient.getAuthentication("bearerAuth");
+            bearerAuth.setUsername(creds.getUsername());
+            bearerAuth.setPassword(creds.getSecret());
+
+            tradingApi = new TradingApi();
+            accountManagementApi = new AccountManagementApi();
+            walletApi = new WalletApi();
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+
+    public ArrayList<LinkedTreeMap> getTradeHistory(CURRENCY type, INSTRUMENT instrument) throws Exception {
+        //1000 entries is maximum
+        LinkedTreeMap tmp1 = (LinkedTreeMap) tradingApi.privateGetUserTradesByCurrencyGet(
+                type.toString(), instrument.toString(), null, null, 1000,  true, "default");
+        LinkedTreeMap tmp2 = (LinkedTreeMap) tmp1.get("result");
+        if((boolean)tmp2.get("has_more")) throw new Exception("Didnt retrieve complete list, theres more!");
+        return (ArrayList<LinkedTreeMap>) tmp2.get("trades");
+    }
+
+    public ArrayList<LinkedTreeMap> getDepositHistory(CURRENCY type) throws ApiException{
+        ArrayList<LinkedTreeMap> result = new ArrayList<>();
+        LinkedTreeMap tmp1 = (LinkedTreeMap) walletApi.privateGetDepositsGet(type.toString(), 1000, 0);
+        LinkedTreeMap tmp2 = (LinkedTreeMap) tmp1.get("result");
+        return (ArrayList<LinkedTreeMap>) tmp2.get("data");
+    }
+
+    public ArrayList<LinkedTreeMap> getWithdrawalHistory(CURRENCY type) throws ApiException{
+        ArrayList<LinkedTreeMap> result = new ArrayList<>();
+        LinkedTreeMap tmp1 = (LinkedTreeMap) walletApi.privateGetWithdrawalsGet(type.toString(), 1000, 0);
+        LinkedTreeMap tmp2 = (LinkedTreeMap) tmp1.get("result");
+        return (ArrayList<LinkedTreeMap>) tmp2.get("data");
+    }
+
+    public ArrayList<LinkedTreeMap> getSettlementHistory(CURRENCY type, SETTLEMENT settlementType) throws Exception {
+        //1000 entries is maximum
+        LinkedTreeMap tmp1 = (LinkedTreeMap) tradingApi.privateGetSettlementHistoryByCurrencyGet(
+                type.toString(), settlementType.toString(), 1000);
+        LinkedTreeMap tmp2 = (LinkedTreeMap) tmp1.get("result");
+        if (!tmp2.get("continuation").equals("none")) throw new Exception("Didnt retrieve complete list, theres more!");
+        return (ArrayList<LinkedTreeMap>) tmp2.get("settlements");
+    }
+
+    public ArrayList<LinkedTreeMap> getOpenOrders(CURRENCY type, INSTRUMENT instrument) throws Exception {
+        //1000 entries is maximum
+        LinkedTreeMap tmp1 = (LinkedTreeMap) tradingApi.privateGetOpenOrdersByCurrencyGet(
+                type.toString(), instrument.toString(), "all");
+        return (ArrayList<LinkedTreeMap>) tmp1.get("result");
+    }
+
+    public Double getTotalInOut(ArrayList<LinkedTreeMap> depositsList, ArrayList<LinkedTreeMap> withdrawalsList){
+        Double totalBalance = 0.0d;
+        for(LinkedTreeMap map : depositsList){
+            totalBalance += ((Double) map.get("amount"));
+        }
+        for(LinkedTreeMap map : withdrawalsList){
+            totalBalance -= ((Double) map.get("amount") + (Double) map.get("fee"));
+        }
+        return totalBalance;
+    }
+}
