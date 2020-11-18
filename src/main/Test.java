@@ -1,20 +1,34 @@
 package main;
 import com.google.gson.internal.LinkedTreeMap;
+import movements.Option;
 import org.openapitools.client.*;
 
 import java.util.*;
 
 public class Test {
 
+    public static ApiController api;
+
     public static void main(String[] args) {
+        setup();
+    }
+
+    public static void setup(){
         try{
-            ApiController api = new ApiController();
-            api.autheticate(new Credentials("C:\\Users\\Paul\\IdeaProjects\\Deribit Client\\src\\secrets\\api.key"));
+            api = new ApiController();
+            api.authenticate(new Credentials("C:\\Users\\Paul\\IdeaProjects\\Deribit Client\\src\\secrets\\api.key"));
+
+
+            Double equity = api.getEquity(ApiController.CURRENCY.BTC);
+            Double index = api.getIndex(ApiController.CURRENCY.BTC);
+
             ArrayList<LinkedTreeMap> tradeList = api.getTradeHistory(ApiController.CURRENCY.BTC, ApiController.INSTRUMENT.option);
             ArrayList<LinkedTreeMap> depositList = api.getDepositHistory(ApiController.CURRENCY.BTC);
             ArrayList<LinkedTreeMap> withdrawalList = api.getWithdrawalHistory(ApiController.CURRENCY.BTC);
             ArrayList<LinkedTreeMap> deliveryList = api.getSettlementHistory(ApiController.CURRENCY.BTC, ApiController.SETTLEMENT.delivery);
             ArrayList<LinkedTreeMap> openOrders = api.getOpenOrders(ApiController.CURRENCY.BTC, ApiController.INSTRUMENT.option);
+
+            Option option = new Option("BTC-10JUL20-9250-C");
 
             ArrayList<String> headers = new ArrayList<>();
             headers.add("underlying_price");

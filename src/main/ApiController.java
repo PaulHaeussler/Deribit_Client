@@ -5,6 +5,7 @@ import org.openapitools.client.ApiClient;
 import org.openapitools.client.ApiException;
 import org.openapitools.client.Configuration;
 import org.openapitools.client.api.AccountManagementApi;
+import org.openapitools.client.api.MarketDataApi;
 import org.openapitools.client.api.TradingApi;
 import org.openapitools.client.api.WalletApi;
 import org.openapitools.client.auth.HttpBasicAuth;
@@ -18,6 +19,7 @@ public class ApiController {
     private TradingApi tradingApi;
     private AccountManagementApi accountManagementApi;
     private WalletApi walletApi;
+    private MarketDataApi marketDataApi;
 
     public enum CURRENCY{
         BTC,
@@ -39,12 +41,13 @@ public class ApiController {
         defaultClient = Configuration.getDefaultApiClient();
     }
 
-    public boolean autheticate(Credentials creds){
+    public boolean authenticate(Credentials creds){
         try{
             HttpBasicAuth bearerAuth = (HttpBasicAuth) defaultClient.getAuthentication("bearerAuth");
             bearerAuth.setUsername(creds.getUsername());
             bearerAuth.setPassword(creds.getSecret());
 
+            marketDataApi = new MarketDataApi();
             tradingApi = new TradingApi();
             accountManagementApi = new AccountManagementApi();
             walletApi = new WalletApi();
@@ -53,6 +56,18 @@ public class ApiController {
             return false;
         }
         return true;
+    }
+
+    public Double getEquity(CURRENCY type) throws Exception {
+        LinkedTreeMap tmp1 = (LinkedTreeMap) accountManagementApi.privateGetAccountSummaryGet(type.toString(), true);
+        LinkedTreeMap tmp2 = (LinkedTreeMap) tmp1.get("result");
+        return (Double) tmp2.get("equity");
+    }
+
+    public Double getIndex(CURRENCY type) throws Exception {
+        LinkedTreeMap tmp1 = (LinkedTreeMap) marketDataApi.publicGetIndexGet(type.toString());
+        LinkedTreeMap tmp2 = (LinkedTreeMap) tmp1.get("result");
+        return (Double) tmp2.get(type.toString());
     }
 
 
