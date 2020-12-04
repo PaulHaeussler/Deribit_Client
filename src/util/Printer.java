@@ -33,7 +33,7 @@ public class Printer {
 
     public static void checkSetup() {
         try{
-            startupLocation = Test2.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+            startupLocation = Printer.class.getProtectionDomain().getCodeSource().getLocation().getPath();
             startupLocation =  "/" + startupLocation.substring(1);
             startupLocation = new File(startupLocation).getParent();
 

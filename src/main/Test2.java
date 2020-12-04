@@ -24,9 +24,9 @@ public class Test2 {
             Utility.checkStartupArgs(args);
 
             api = new ApiController();
-            api.authenticate(new Credentials(repo + "\\api.key"));
-            ApiController.userMappingsBTC = Movement.getUserMappings(repo + "\\users_btc.mapping");
-            ApiController.userMappingsETH = Movement.getUserMappings(repo + "\\users_eth.mapping");
+            api.authenticate(new Credentials(repo + "/api.key"));
+            ApiController.userMappingsBTC = Movement.getUserMappings(repo + "/users_btc.mapping");
+            ApiController.userMappingsETH = Movement.getUserMappings(repo + "/users_eth.mapping");
 
             System.out.println("Total trade history change: " + totalChange() + " BTC");
             System.out.println("Total trade history gains: " + totalGains() + " BTC");
