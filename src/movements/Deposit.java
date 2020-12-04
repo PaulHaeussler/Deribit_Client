@@ -47,7 +47,7 @@ public class Deposit extends Movement{
             dep.currency = ApiController.CURRENCY.valueOf(getIfNotNull(map, "currency").toString());
             dep.amount = (double) getIfNotNull(map, "amount");
             dep.address = getIfNotNull(map, "address").toString();
-            dep.user = getUser(dep.transaction_id, Test2.getUserMappingByCurrency(dep.currency));
+            dep.user = getUser(dep.transaction_id, ApiController.getUserMappingByCurrency(dep.currency));
 
             results.add(dep);
         }

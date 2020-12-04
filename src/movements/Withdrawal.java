@@ -54,7 +54,7 @@ public class Withdrawal extends Movement{
             wit.id = (double) getIfNotNull(map, "id");
             wit.fee = (double) getIfNotNull(map, "fee");
             wit.priority = (double) getIfNotNull(map, "priority");
-            wit.user = getUser(wit.transaction_id, Test2.getUserMappingByCurrency(wit.currency));
+            wit.user = getUser(wit.transaction_id, ApiController.getUserMappingByCurrency(wit.currency));
 
             results.add(wit);
         }

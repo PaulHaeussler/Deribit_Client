@@ -15,8 +15,7 @@ public class Test2 {
 
     private static ApiController api;
 
-    public static HashMap<String, String> userMappingsBTC;
-    public static HashMap<String, String> userMappingsETH;
+
 
     public static void main(String[] args){
 
@@ -26,8 +25,8 @@ public class Test2 {
 
             api = new ApiController();
             api.authenticate(new Credentials(repo + "\\api.key"));
-            userMappingsBTC = Movement.getUserMappings(repo + "\\users_btc.mapping");
-            userMappingsETH = Movement.getUserMappings(repo + "\\users_eth.mapping");
+            ApiController.userMappingsBTC = Movement.getUserMappings(repo + "\\users_btc.mapping");
+            ApiController.userMappingsETH = Movement.getUserMappings(repo + "\\users_eth.mapping");
 
             System.out.println("Total trade history change: " + totalChange() + " BTC");
             System.out.println("Total trade history gains: " + totalGains() + " BTC");
@@ -73,14 +72,5 @@ public class Test2 {
         }
 
         return change;
-    }
-
-    public static HashMap<String, String> getUserMappingByCurrency(ApiController.CURRENCY currency){
-        if(currency == ApiController.CURRENCY.BTC){
-            return userMappingsBTC;
-        } else if(currency == ApiController.CURRENCY.ETH) {
-            return userMappingsETH;
-        }
-        return null;
     }
 }

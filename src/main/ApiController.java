@@ -25,6 +25,10 @@ public class ApiController {
     private WalletApi walletApi;
     private MarketDataApi marketDataApi;
 
+
+    public static HashMap<String, String> userMappingsBTC;
+    public static HashMap<String, String> userMappingsETH;
+
     public enum CURRENCY{
         BTC,
         ETH
@@ -176,5 +180,14 @@ public class ApiController {
         }
 
         return moments;
+    }
+
+    public static HashMap<String, String> getUserMappingByCurrency(ApiController.CURRENCY currency){
+        if(currency == ApiController.CURRENCY.BTC){
+            return userMappingsBTC;
+        } else if(currency == ApiController.CURRENCY.ETH) {
+            return userMappingsETH;
+        }
+        return null;
     }
 }
