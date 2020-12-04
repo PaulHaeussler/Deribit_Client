@@ -5,10 +5,7 @@ import movements.*;
 import org.openapitools.client.ApiClient;
 import org.openapitools.client.ApiException;
 import org.openapitools.client.Configuration;
-import org.openapitools.client.api.AccountManagementApi;
-import org.openapitools.client.api.MarketDataApi;
-import org.openapitools.client.api.TradingApi;
-import org.openapitools.client.api.WalletApi;
+import org.openapitools.client.api.*;
 import org.openapitools.client.auth.HttpBasicAuth;
 
 import java.math.BigDecimal;
@@ -20,6 +17,7 @@ public class ApiController {
 
     private ApiClient defaultClient;
 
+    private PrivateApi privateApi;
     private TradingApi tradingApi;
     private AccountManagementApi accountManagementApi;
     private WalletApi walletApi;
@@ -55,6 +53,7 @@ public class ApiController {
             bearerAuth.setUsername(creds.getUsername());
             bearerAuth.setPassword(creds.getSecret());
 
+            privateApi = new PrivateApi();
             marketDataApi = new MarketDataApi();
             tradingApi = new TradingApi();
             accountManagementApi = new AccountManagementApi();
@@ -133,7 +132,7 @@ public class ApiController {
 
     public void killPosition(Trade trade) throws Exception {
         BigDecimal counterPos = new BigDecimal(trade.openPos * -1.0);
-        tradingApi.privateBuyGet(trade.instrumentName, counterPos, "market", "Sentry", null, "immediate_or_cancel", null, false, false, null, null, null);
+        privateApi.privateBuyGet(trade.instrumentName, counterPos, "market", "Sentry", null, "immediate_or_cancel", null, false, false, null, null, null);
     }
 
 
