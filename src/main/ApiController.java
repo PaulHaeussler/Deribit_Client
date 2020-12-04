@@ -133,7 +133,7 @@ public class ApiController {
 
     public void killPosition(Trade trade) throws Exception {
         BigDecimal counterPos = new BigDecimal(trade.openPos * -1.0);
-        tradingApi.privateBuyGet(trade.instrumentName, counterPos, "market", "Sentry", null, "immediate_or_cancel", null, null, null, null, null, null);
+        tradingApi.privateBuyGet(trade.instrumentName, counterPos, "market", "Sentry", null, "immediate_or_cancel", null, false, false, null, null, null);
     }
 
 
