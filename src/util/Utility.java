@@ -1,21 +1,15 @@
 package util;
 
-import main.Main;
+import main.Test2;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 public class Utility {
 
@@ -29,18 +23,14 @@ public class Utility {
         for (int i = 0; i < args.length; i++){
             if(args[i].startsWith("-")){
                 switch(args[i]){
-                    case "-usdToEur":
-                        Main.usdToEur = getNextIfExistent(args, i);
+                    case "-p":
+                        Test2.repo = getNextIfExistent(args, i);
                         break;
                     default:
                         break;
                 }
             }
             Printer.printToLog("Found startup param " + args[i], Printer.LOGTYPE.INFO);
-        }
-        if(Main.usdToEur.equals("")){
-            Printer.printError("No Exchange course USD/EUR supplied (-usdToEur)");
-            System.exit(1);
         }
     }
 

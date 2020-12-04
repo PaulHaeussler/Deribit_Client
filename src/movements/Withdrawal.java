@@ -2,6 +2,7 @@ package movements;
 
 import com.google.gson.internal.LinkedTreeMap;
 import main.ApiController;
+import main.Test2;
 
 import java.util.ArrayList;
 
@@ -53,7 +54,7 @@ public class Withdrawal extends Movement{
             wit.id = (double) getIfNotNull(map, "id");
             wit.fee = (double) getIfNotNull(map, "fee");
             wit.priority = (double) getIfNotNull(map, "priority");
-            wit.user = getUser(wit.transaction_id);
+            wit.user = getUser(wit.transaction_id, Test2.getUserMappingByCurrency(wit.currency));
 
             results.add(wit);
         }

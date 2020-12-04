@@ -26,6 +26,7 @@ public class Trade extends Movement {
     public String instrumentName;
     public Option.STATE state;
 
+    public double openPos;
     public double change;
     public double timestamp;
 
@@ -40,7 +41,7 @@ public class Trade extends Movement {
     }
 
 
-    public Trade(ArrayList<Option> opts, Delivery del) throws Exception {
+    public Trade(ArrayList<Option> opts, Delivery del, Double index) throws Exception {
         options = opts;
         delivery = del;
 
@@ -62,8 +63,9 @@ public class Trade extends Movement {
             opChange += o.change;
         }
 
+        openPos = 0.0;
         if (del == null) {
-            double openPos = aggregatePositions(options);
+            openPos = aggregatePositions(options);
             if(Utility.isZero(openPos, 0.0001)){
                 state = BUYBACK;
             } else {
@@ -73,10 +75,26 @@ public class Trade extends Movement {
             state = Option.STATE.FILLED;
             opChange += del.change;
         }
-        change = opChange;
+        change = state == OPEN ? estimateValue(op, openPos, opChange, index) : opChange;
     }
 
-    public static ArrayList<Trade> aggregateTrades(ArrayList<Option> options, ArrayList<Delivery> deliveries, ApiController.CURRENCY currency) throws Exception {
+    private static Double estimateValue(Option op, double openPos, double change, double index){
+        double diff = 0.0;
+
+        if(op.kind == Option.KIND.PUT && op.strikePrice > index){
+            diff = op.strikePrice - index;
+        }
+        if(op.kind == Option.KIND.CALL && op.strikePrice < index){
+            diff = index - op.strikePrice;
+        }
+        double liability = diff * openPos;
+        double effectiveDiff = liability + change * index;
+
+        return effectiveDiff / index;
+    }
+
+
+    public static ArrayList<Trade> aggregateTrades(ArrayList<Option> options, ArrayList<Delivery> deliveries, ApiController.CURRENCY currency, Double index) throws Exception {
         ArrayList<Trade> results = new ArrayList<>();
         ArrayList<String> processed = new ArrayList<>();
 
@@ -92,7 +110,7 @@ public class Trade extends Movement {
                 if(option.instrumentName.equals(delivery.instrumentName)) del = delivery;
             }
             processed.add(option.instrumentName);
-            results.add(new Trade(opts, del));
+            results.add(new Trade(opts, del, index));
         }
 
         return results;

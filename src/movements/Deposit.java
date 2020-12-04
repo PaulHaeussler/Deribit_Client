@@ -2,6 +2,7 @@ package movements;
 
 import com.google.gson.internal.LinkedTreeMap;
 import main.ApiController;
+import main.Test2;
 
 import java.util.ArrayList;
 
@@ -46,7 +47,7 @@ public class Deposit extends Movement{
             dep.currency = ApiController.CURRENCY.valueOf(getIfNotNull(map, "currency").toString());
             dep.amount = (double) getIfNotNull(map, "amount");
             dep.address = getIfNotNull(map, "address").toString();
-            dep.user = getUser(dep.transaction_id);
+            dep.user = getUser(dep.transaction_id, Test2.getUserMappingByCurrency(dep.currency));
 
             results.add(dep);
         }

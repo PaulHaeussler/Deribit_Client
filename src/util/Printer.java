@@ -1,6 +1,6 @@
 package util;
 
-import main.Main;
+import main.Test2;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -33,7 +33,7 @@ public class Printer {
 
     public static void checkSetup() {
         try{
-            startupLocation = Main.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+            startupLocation = Test2.class.getProtectionDomain().getCodeSource().getLocation().getPath();
             startupLocation = startupLocation.substring(1);
             startupLocation = new File(startupLocation).getParent();
 

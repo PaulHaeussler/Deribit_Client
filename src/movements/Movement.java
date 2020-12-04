@@ -1,7 +1,5 @@
 package movements;
 
-import main.Main;
-
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -45,8 +43,8 @@ public class Movement {
     }
 
 
-    public static String getUser(String transID){
-        String result = Main.userMappings.get(transID);
+    public static String getUser(String transID, HashMap<String, String> userMapping){
+        String result = userMapping.get(transID);
         if(result == null) result = "UNKNOWN";
         return result;
     }

@@ -1,6 +1,7 @@
 package main;
 
 import com.google.gson.internal.LinkedTreeMap;
+import movements.Trade;
 import org.openapitools.client.ApiClient;
 import org.openapitools.client.ApiException;
 import org.openapitools.client.Configuration;
@@ -10,6 +11,7 @@ import org.openapitools.client.api.TradingApi;
 import org.openapitools.client.api.WalletApi;
 import org.openapitools.client.auth.HttpBasicAuth;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 public class ApiController {
@@ -119,5 +121,19 @@ public class ApiController {
             totalBalance -= ((Double) map.get("amount") + (Double) map.get("fee"));
         }
         return totalBalance;
+    }
+
+
+
+    public void killPosition(Trade trade) throws Exception {
+        BigDecimal counterPos = new BigDecimal(trade.openPos * -1.0);
+        tradingApi.privateBuyGet(trade.instrumentName, counterPos, "market", "Sentry", null, "immediate_or_cancel", null, null, null, null, null, null);
+    }
+
+
+    public LinkedTreeMap getBookSummary(String instrumentName) throws Exception {
+        LinkedTreeMap tmp = (LinkedTreeMap) marketDataApi.publicGetBookSummaryByInstrumentGet(instrumentName);
+        ArrayList al = (ArrayList) tmp.get("result");
+        return (LinkedTreeMap) al.get(0);
     }
 }

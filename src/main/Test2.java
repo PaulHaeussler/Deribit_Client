@@ -1,6 +1,7 @@
 package main;
 
 
+import com.google.gson.internal.LinkedTreeMap;
 import movements.*;
 import server.ServerHandler;
 import util.Printer;
@@ -8,17 +9,14 @@ import util.Utility;
 
 import java.util.*;
 
-public class Main {
+public class Test2 {
 
-    public static String usdToEur = "";
-
-    private static ServerHandler sh;
-    private static TimerTask tt;
-    private static Timer t;
+    public static String repo = "";
 
     private static ApiController api;
 
-    public static HashMap<String, String> userMappings;
+    public static HashMap<String, String> userMappingsBTC;
+    public static HashMap<String, String> userMappingsETH;
 
     public static void main(String[] args){
 
@@ -27,15 +25,20 @@ public class Main {
             Utility.checkStartupArgs(args);
 
             api = new ApiController();
-            api.authenticate(new Credentials("C:\\Users\\Paul\\IdeaProjects\\Deribit Client\\src\\secrets\\api.key"));
-            userMappings = Movement.getUserMappings("C:\\Users\\Paul\\IdeaProjects\\Deribit Client\\src\\secrets\\users_eth.mapping");
+            api.authenticate(new Credentials(repo + "\\api.key"));
+            userMappingsBTC = Movement.getUserMappings(repo + "\\users_btc.mapping");
+            userMappingsETH = Movement.getUserMappings(repo + "\\users_eth.mapping");
 
             System.out.println("Total trade history change: " + totalChange() + " BTC");
             System.out.println("Total trade history gains: " + totalGains() + " BTC");
 
-            compileTradeList(true, ApiController.CURRENCY.ETH);
 
-            //t = new Timer();
+
+            TreeMap<Double, Moment> hb = compileTradeList(true, ApiController.CURRENCY.BTC);
+            TreeMap<Double, Moment> he = compileTradeList(true, ApiController.CURRENCY.ETH);
+
+            LinkedTreeMap map = api.getBookSummary("BTC-11DEC20-20000-C");
+            System.out.println();
             //t.scheduleAtFixedRate(tt, 5000, 5000);
             //while(true);
 
@@ -72,13 +75,14 @@ public class Main {
         return change;
     }
 
-    private static void compileTradeList(boolean includeOpen, ApiController.CURRENCY currency) throws Exception {
+    private static TreeMap<Double, Moment> compileTradeList(boolean includeOpen, ApiController.CURRENCY currency) throws Exception {
         ArrayList<Option> options = Option.parseList(api.getTradeHistory(currency, ApiController.INSTRUMENT.option));
         ArrayList<Delivery> deliveries = Delivery.parseList(api.getSettlementHistory(currency, ApiController.SETTLEMENT.delivery));
         ArrayList<Deposit> deposits = Deposit.parseList(api.getDepositHistory(currency));
         ArrayList<Withdrawal> withdrawals = Withdrawal.parseList(api.getWithdrawalHistory(currency));
 
-        ArrayList<Trade> trades = Trade.aggregateTrades(options, deliveries, currency);
+        Double index = api.getIndex(currency);
+        ArrayList<Trade> trades = Trade.aggregateTrades(options, deliveries, currency, index);
         TreeMap<Double, Movement> sortedMovements = new TreeMap<>();
 
 
@@ -105,6 +109,16 @@ public class Main {
             moments.put(moment.timestamp, moment);
         }
 
-        System.out.println("compiled");
+        return moments;
+    }
+
+
+    public static HashMap<String, String> getUserMappingByCurrency(ApiController.CURRENCY currency){
+        if(currency == ApiController.CURRENCY.BTC){
+            return userMappingsBTC;
+        } else if(currency == ApiController.CURRENCY.ETH) {
+            return userMappingsETH;
+        }
+        return null;
     }
 }
