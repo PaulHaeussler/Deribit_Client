@@ -17,14 +17,15 @@ public class Utility {
     public static HashMap<String, String> reqHeaders = new HashMap<>();
     private static byte[] quota_exceeded = null;
 
-    public static void checkStartupArgs(String[] args){
+    public static String checkStartupArgs(String[] args){
         if(args.length == 0) Printer.printToLog("No startup params given", Printer.LOGTYPE.INFO);
         boolean isPassword = false;
+        String repo = "";
         for (int i = 0; i < args.length; i++){
             if(args[i].startsWith("-")){
                 switch(args[i]){
                     case "-p":
-                        Test2.repo = getNextIfExistent(args, i);
+                        repo = getNextIfExistent(args, i);
                         break;
                     default:
                         break;
@@ -32,6 +33,7 @@ public class Utility {
             }
             Printer.printToLog("Found startup param " + args[i], Printer.LOGTYPE.INFO);
         }
+        return repo;
     }
 
 
