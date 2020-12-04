@@ -21,7 +21,7 @@ public class Test2 {
 
         try{
             Printer.checkSetup();
-            Utility.checkStartupArgs(args);
+            repo = Utility.checkStartupArgs(args);
 
             api = new ApiController();
             api.authenticate(new Credentials(repo + "/api.key"));
