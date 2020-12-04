@@ -157,17 +157,17 @@ public class ApiController {
 
 
         for(Deposit dep : deposits){
-            System.out.println("Deposit " + dep.amount + " BTC ID=" + dep.transaction_id);
+            //System.out.println("Deposit " + dep.amount + " BTC ID=" + dep.transaction_id);
             sortedMovements.put(dep.getTimestamp(), dep);
         }
 
         for(Withdrawal wit : withdrawals){
-            System.out.println("Withdrawal " + wit.amount + " BTC ID=" + wit.transaction_id);
+            //System.out.println("Withdrawal " + wit.amount + " BTC ID=" + wit.transaction_id);
             sortedMovements.put(wit.getTimestamp(), wit);
         }
 
         for(Trade trade : trades){
-            System.out.println(trade.instrumentName + "     Change: " + trade.getChange());
+            //System.out.println(trade.instrumentName + "     Change: " + trade.getChange());
             if((!includeOpen && trade.state != Option.STATE.OPEN) || includeOpen) sortedMovements.put(trade.getTimestamp(), trade);
         }
 
