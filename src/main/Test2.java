@@ -34,8 +34,8 @@ public class Test2 {
 
 
 
-            TreeMap<Double, Moment> hb = compileTradeList(true, ApiController.CURRENCY.BTC);
-            TreeMap<Double, Moment> he = compileTradeList(true, ApiController.CURRENCY.ETH);
+            TreeMap<Double, Moment> hb = ApiController.compileTradeList(api, true, ApiController.CURRENCY.BTC);
+            TreeMap<Double, Moment> he = ApiController.compileTradeList(api, true, ApiController.CURRENCY.ETH);
 
             LinkedTreeMap map = api.getBookSummary("BTC-11DEC20-20000-C");
             System.out.println();
@@ -74,44 +74,6 @@ public class Test2 {
 
         return change;
     }
-
-    private static TreeMap<Double, Moment> compileTradeList(boolean includeOpen, ApiController.CURRENCY currency) throws Exception {
-        ArrayList<Option> options = Option.parseList(api.getTradeHistory(currency, ApiController.INSTRUMENT.option));
-        ArrayList<Delivery> deliveries = Delivery.parseList(api.getSettlementHistory(currency, ApiController.SETTLEMENT.delivery));
-        ArrayList<Deposit> deposits = Deposit.parseList(api.getDepositHistory(currency));
-        ArrayList<Withdrawal> withdrawals = Withdrawal.parseList(api.getWithdrawalHistory(currency));
-
-        Double index = api.getIndex(currency);
-        ArrayList<Trade> trades = Trade.aggregateTrades(options, deliveries, currency, index);
-        TreeMap<Double, Movement> sortedMovements = new TreeMap<>();
-
-
-        for(Deposit dep : deposits){
-            System.out.println("Deposit " + dep.amount + " BTC ID=" + dep.transaction_id);
-            sortedMovements.put(dep.getTimestamp(), dep);
-        }
-
-        for(Withdrawal wit : withdrawals){
-            System.out.println("Withdrawal " + wit.amount + " BTC ID=" + wit.transaction_id);
-            sortedMovements.put(wit.getTimestamp(), wit);
-        }
-
-        for(Trade trade : trades){
-            System.out.println(trade.instrumentName + "     Change: " + trade.getChange());
-            if((!includeOpen && trade.state != Option.STATE.OPEN) || includeOpen) sortedMovements.put(trade.getTimestamp(), trade);
-        }
-
-        TreeMap<Double, Moment> moments = new TreeMap<>();
-        Moment prev = null;
-        for(Movement mov : sortedMovements.values()){
-            Moment moment = new Moment(mov, prev);
-            prev = moment;
-            moments.put(moment.timestamp, moment);
-        }
-
-        return moments;
-    }
-
 
     public static HashMap<String, String> getUserMappingByCurrency(ApiController.CURRENCY currency){
         if(currency == ApiController.CURRENCY.BTC){

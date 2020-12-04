@@ -1,7 +1,7 @@
 package main;
 
 import com.google.gson.internal.LinkedTreeMap;
-import movements.Trade;
+import movements.*;
 import org.openapitools.client.ApiClient;
 import org.openapitools.client.ApiException;
 import org.openapitools.client.Configuration;
@@ -13,6 +13,8 @@ import org.openapitools.client.auth.HttpBasicAuth;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.TreeMap;
 
 public class ApiController {
 
@@ -135,5 +137,44 @@ public class ApiController {
         LinkedTreeMap tmp = (LinkedTreeMap) marketDataApi.publicGetBookSummaryByInstrumentGet(instrumentName);
         ArrayList al = (ArrayList) tmp.get("result");
         return (LinkedTreeMap) al.get(0);
+    }
+
+
+
+    public static TreeMap<Double, Moment> compileTradeList(ApiController api, boolean includeOpen, ApiController.CURRENCY currency) throws Exception {
+        ArrayList<Option> options = Option.parseList(api.getTradeHistory(currency, ApiController.INSTRUMENT.option));
+        ArrayList<Delivery> deliveries = Delivery.parseList(api.getSettlementHistory(currency, ApiController.SETTLEMENT.delivery));
+        ArrayList<Deposit> deposits = Deposit.parseList(api.getDepositHistory(currency));
+        ArrayList<Withdrawal> withdrawals = Withdrawal.parseList(api.getWithdrawalHistory(currency));
+
+        Double index = api.getIndex(currency);
+        ArrayList<Trade> trades = Trade.aggregateTrades(options, deliveries, currency, index);
+        TreeMap<Double, Movement> sortedMovements = new TreeMap<>();
+
+
+        for(Deposit dep : deposits){
+            System.out.println("Deposit " + dep.amount + " BTC ID=" + dep.transaction_id);
+            sortedMovements.put(dep.getTimestamp(), dep);
+        }
+
+        for(Withdrawal wit : withdrawals){
+            System.out.println("Withdrawal " + wit.amount + " BTC ID=" + wit.transaction_id);
+            sortedMovements.put(wit.getTimestamp(), wit);
+        }
+
+        for(Trade trade : trades){
+            System.out.println(trade.instrumentName + "     Change: " + trade.getChange());
+            if((!includeOpen && trade.state != Option.STATE.OPEN) || includeOpen) sortedMovements.put(trade.getTimestamp(), trade);
+        }
+
+        TreeMap<Double, Moment> moments = new TreeMap<>();
+        Moment prev = null;
+        for(Movement mov : sortedMovements.values()){
+            Moment moment = new Moment(mov, prev);
+            prev = moment;
+            moments.put(moment.timestamp, moment);
+        }
+
+        return moments;
     }
 }
