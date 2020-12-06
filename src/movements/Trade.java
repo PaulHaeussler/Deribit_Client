@@ -31,6 +31,7 @@ public class Trade extends Movement {
     public String initialRuntime;
     public double openPos;
     public double change;
+    public double maxGain;
     public double timestamp;
 
     @Override
@@ -59,7 +60,7 @@ public class Trade extends Movement {
         kind = op.kind;
         instrumentName = op.instrumentName;
 
-        initialRuntime = convertMillisToHMmSs((int)((expiryDate.getTime() - (long)timestamp)/1000));
+        initialRuntime = convertMillisToHMmSs((expiryDate.getTime() - (long)timestamp)/1000);
 
         double opChange = 0.0;
         timestamp = op.timestamp;
@@ -67,6 +68,7 @@ public class Trade extends Movement {
         for(Option o : options){
             opChange += o.change;
         }
+        maxGain = opChange;
 
         openPos = 0.0;
         if (del == null) {
@@ -80,12 +82,14 @@ public class Trade extends Movement {
             state = Option.STATE.FILLED;
             opChange += del.change;
         }
-        change = state == OPEN ? estimateValue(op, openPos, opChange, index) : opChange;
+
 
         timeRemaining = state == OPEN ? convertMillisToHMmSs(expiryDate.getTime() - System.currentTimeMillis()) : convertMillisToHMmSs(0);
+
+        change = state == OPEN ? estimateValue(op, openPos, opChange, index, (expiryDate.getTime() - System.currentTimeMillis()), (expiryDate.getTime() - (long)timestamp)/1000) : opChange;
     }
 
-    private static Double estimateValue(Option op, double openPos, double change, double index){
+    private static Double estimateValue(Option op, double openPos, double change, double index, long timeRemaining, long initialRuntime){
         double diff = 0.0;
 
         if(op.kind == Option.KIND.PUT && op.strikePrice > index){
@@ -96,11 +100,16 @@ public class Trade extends Movement {
         }
         double liability = diff * openPos;
         double effectiveDiff = liability + change * index;
-        double weightedEffDiff = effectiveDiff / index;
+        double btcEffDiff = effectiveDiff / index;
 
+        double result = btcEffDiff;
 
+        if(result > 0) {
+            double percentRemaining = (double) timeRemaining / (double) initialRuntime;
+            result = (1-percentRemaining) * btcEffDiff;
+        }
 
-        return weightedEffDiff;
+        return result;
     }
 
 
