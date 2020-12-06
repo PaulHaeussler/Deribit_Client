@@ -60,10 +60,12 @@ public class Trade extends Movement {
         kind = op.kind;
         instrumentName = op.instrumentName;
 
-        initialRuntime = convertMillisToHMmSs((expiryDate.getTime() - (long)timestamp)/1000);
 
         double opChange = 0.0;
         timestamp = op.timestamp;
+
+        initialRuntime = convertMillisToHMmSs((expiryDate.getTime() - (long)timestamp));
+
 
         for(Option o : options){
             opChange += o.change;
@@ -86,7 +88,7 @@ public class Trade extends Movement {
 
         timeRemaining = state == OPEN ? convertMillisToHMmSs(expiryDate.getTime() - System.currentTimeMillis()) : convertMillisToHMmSs(0);
 
-        change = state == OPEN ? estimateValue(op, openPos, opChange, index, (expiryDate.getTime() - System.currentTimeMillis()), (expiryDate.getTime() - (long)timestamp)/1000) : opChange;
+        change = state == OPEN ? estimateValue(op, openPos, opChange, index, (expiryDate.getTime() - System.currentTimeMillis()), (expiryDate.getTime() - (long)timestamp)) : opChange;
     }
 
     private static Double estimateValue(Option op, double openPos, double change, double index, long timeRemaining, long initialRuntime){
