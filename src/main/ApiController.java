@@ -9,6 +9,7 @@ import org.openapitools.client.api.*;
 import org.openapitools.client.auth.HttpBasicAuth;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
@@ -131,8 +132,9 @@ public class ApiController {
 
 
     public void killPosition(Trade trade) throws Exception {
-        BigDecimal counterPos = new BigDecimal(trade.openPos * -1.0);
-        privateApi.privateBuyGet(trade.instrumentName, counterPos, "market", "Sentry", null, "immediate_or_cancel", null, false, false, null, null, null);
+        BigDecimal counterPos = new BigDecimal(trade.openPos, MathContext.DECIMAL64).multiply(new BigDecimal(-1));
+
+        privateApi.privateBuyGet(trade.instrumentName, counterPos, "market", null, null, null, null, null, null, null, null, null);
     }
 
 

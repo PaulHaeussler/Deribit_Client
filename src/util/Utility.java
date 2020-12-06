@@ -17,15 +17,32 @@ public class Utility {
     public static HashMap<String, String> reqHeaders = new HashMap<>();
     private static byte[] quota_exceeded = null;
 
-    public static String checkStartupArgs(String[] args){
+    public static HashMap<String, String> checkStartupArgs(String[] args){
         if(args.length == 0) Printer.printToLog("No startup params given", Printer.LOGTYPE.INFO);
         boolean isPassword = false;
         String repo = "";
+        String db_user = null;
+        String db_pass = null;
+        String db_host = null;
+        String db_schema = null;
         for (int i = 0; i < args.length; i++){
             if(args[i].startsWith("-")){
                 switch(args[i]){
                     case "-p":
                         repo = getNextIfExistent(args, i);
+                        break;
+                    case "-user":
+                        db_user = getNextIfExistent(args, i);
+                        break;
+                    case "-pw":
+                        db_pass = getNextIfExistent(args, i);
+                        args[i + 1] = "********";
+                        break;
+                    case "-host":
+                        db_host = getNextIfExistent(args, i);
+                        break;
+                    case "-dbname":
+                        db_schema = getNextIfExistent(args, i);
                         break;
                     default:
                         break;
@@ -33,7 +50,23 @@ public class Utility {
             }
             Printer.printToLog("Found startup param " + args[i], Printer.LOGTYPE.INFO);
         }
-        return repo;
+
+        if(repo.equals("")) {
+            Printer.printError("No repository path supplied!");
+            System.exit(1);
+        }
+        if(db_host == null || db_pass == null ||db_user == null || db_schema == null){
+            Printer.printError("Insufficient database information supplied!");
+            System.exit(1);
+        }
+
+        HashMap<String, String> arguments = new HashMap<>();
+        arguments.put("repo", repo);
+        arguments.put("user", db_user);
+        arguments.put("pw", db_pass);
+        arguments.put("host", db_host);
+        arguments.put("dbname", db_schema);
+        return arguments;
     }
 
 

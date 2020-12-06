@@ -2,6 +2,7 @@ package main;
 
 
 import com.google.gson.internal.LinkedTreeMap;
+import db.Database;
 import movements.*;
 import server.ServerHandler;
 import util.Printer;
@@ -21,7 +22,11 @@ public class Test2 {
 
         try{
             Printer.checkSetup();
-            repo = Utility.checkStartupArgs(args);
+            HashMap<String, String> argmap = Utility.checkStartupArgs(args);
+            repo = argmap.get("repo");
+            Database db = new Database(argmap.get("user"), argmap.get("pw"), argmap.get("host"), argmap.get("dbname"));
+
+
 
             api = new ApiController();
             api.authenticate(new Credentials(repo + "/api.key"));
@@ -37,7 +42,7 @@ public class Test2 {
             TreeMap<Double, Moment> he = ApiController.compileTradeList(api, true, ApiController.CURRENCY.ETH);
 
             LinkedTreeMap map = api.getBookSummary("BTC-11DEC20-20000-C");
-            
+
             System.out.println();
             //t.scheduleAtFixedRate(tt, 5000, 5000);
             //while(true);
