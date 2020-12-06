@@ -4,6 +4,7 @@ package movements;
 import main.ApiController;
 import util.Utility;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -26,6 +27,8 @@ public class Trade extends Movement {
     public String instrumentName;
     public Option.STATE state;
 
+    public String timeRemaining;
+    public String initialRuntime;
     public double openPos;
     public double change;
     public double timestamp;
@@ -56,6 +59,8 @@ public class Trade extends Movement {
         kind = op.kind;
         instrumentName = op.instrumentName;
 
+        initialRuntime = convertMillisToHMmSs((int)((expiryDate.getTime() - (long)timestamp)/1000));
+
         double opChange = 0.0;
         timestamp = op.timestamp;
 
@@ -76,6 +81,8 @@ public class Trade extends Movement {
             opChange += del.change;
         }
         change = state == OPEN ? estimateValue(op, openPos, opChange, index) : opChange;
+
+        timeRemaining = state == OPEN ? convertMillisToHMmSs(expiryDate.getTime() - System.currentTimeMillis()) : convertMillisToHMmSs(0);
     }
 
     private static Double estimateValue(Option op, double openPos, double change, double index){
@@ -89,8 +96,11 @@ public class Trade extends Movement {
         }
         double liability = diff * openPos;
         double effectiveDiff = liability + change * index;
+        double weightedEffDiff = effectiveDiff / index;
 
-        return effectiveDiff / index;
+
+
+        return weightedEffDiff;
     }
 
 
@@ -123,5 +133,14 @@ public class Trade extends Movement {
             if(o.direction.equals("buy")) pos += o.amount;
         }
         return pos;
+    }
+
+    private static String convertMillisToHMmSs(long ms) {
+        long seconds = ms/1000;
+        long s = seconds % 60;
+        long m = (seconds / 60) % 60;
+        long h = (seconds / (60 * 60)) % 24;
+        long d = (seconds / (60 * 60))/24;
+        return String.format("%02d:%02d:%02d:%02d",d, h,m,s);
     }
 }
