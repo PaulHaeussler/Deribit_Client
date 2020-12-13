@@ -20,7 +20,7 @@ public class Printer {
 
     private static int exceptionsThrown = 0;
 
-    private static final String rootPath = "/deribitClient/";
+    private static  String rootPath = "";
 
     public enum LOGTYPE{
         WARNING,
@@ -31,7 +31,8 @@ public class Printer {
         IMAGE
     }
 
-    public static void checkSetup() {
+    public static void checkSetup(String root) {
+        rootPath = "/" + root + "/";
         try{
             startupLocation = Printer.class.getProtectionDomain().getCodeSource().getLocation().getPath();
             startupLocation =  "/" + startupLocation.substring(1);

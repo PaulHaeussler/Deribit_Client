@@ -21,7 +21,7 @@ public class Test2 {
     public static void main(String[] args){
 
         try{
-            Printer.checkSetup();
+            Printer.checkSetup("DeribitClient");
             HashMap<String, String> argmap = Utility.checkStartupArgs(args);
             repo = argmap.get("repo");
             Database db = new Database(argmap.get("user"), argmap.get("pw"), argmap.get("host"), argmap.get("dbname"));
