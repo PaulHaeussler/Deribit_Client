@@ -34,6 +34,17 @@ public class Trade extends Movement {
     public double maxGain;
     public double timestamp;
 
+    //evaluation
+    public Double index;
+    public Double diffToStrike;
+    public Double ask;
+    public Double avgPrem;
+    public Double maxPrice;
+    public Double priceDiff;
+    public Double currPrice;
+    public Double stopLoss;
+
+
     @Override
     public double getChange(){
         return change;

@@ -38,8 +38,8 @@ public class Test2 {
 
 
 
-            TreeMap<Double, Moment> hb = ApiController.compileTradeList(api, true, ApiController.CURRENCY.BTC);
-            TreeMap<Double, Moment> he = ApiController.compileTradeList(api, true, ApiController.CURRENCY.ETH);
+            TreeMap<Double, Moment> hb = ApiController.compileTradeList(api, false, ApiController.CURRENCY.BTC);
+            TreeMap<Double, Moment> he = ApiController.compileTradeList(api, false, ApiController.CURRENCY.ETH);
 
             LinkedTreeMap map = api.getBookSummary("BTC-11DEC20-20000-C");
 
