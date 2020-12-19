@@ -14,8 +14,9 @@ import java.util.Objects;
 public class Utility {
 
     private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
-    public static HashMap<String, String> reqHeaders = new HashMap<>();
-    private static byte[] quota_exceeded = null;
+
+    private static boolean noKill = false;
+
 
     public static HashMap<String, String> checkStartupArgs(String[] args){
         if(args.length == 0) Printer.printToLog("No startup params given", Printer.LOGTYPE.INFO);
@@ -44,6 +45,8 @@ public class Utility {
                     case "-dbname":
                         db_schema = getNextIfExistent(args, i);
                         break;
+                    case "-nokill":
+                        noKill = true;
                     default:
                         break;
                 }
