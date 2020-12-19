@@ -15,7 +15,7 @@ public class Utility {
 
     private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
 
-    private static boolean noKill = false;
+    public static boolean noKill = false;
 
 
     public static HashMap<String, String> checkStartupArgs(String[] args){
