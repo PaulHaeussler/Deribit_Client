@@ -158,7 +158,7 @@ public class Trade extends Movement {
             this.avgPrem = Math.abs(this.maxGain / this.openPos);
             this.priceDiff = this.ask - this.avgPrem;
             this.currValue = this.priceDiff * this.openPos;
-            Printer.printToLog(this.instrumentName + " diff to strike: " + df.format(this.diffToStrike) + "; MaxPrice: " + df2.format(this.maxPrice) + " - Ask: " + df2.format(this.ask) + "; CurrVal: " + df2.format(this.currValue), INFO);
+            Printer.printToLog(this.instrumentName + " diff to strike: " + df.format(this.diffToStrike) + "; - Ask: " + df2.format(this.ask) + "; CurrVal: " + df2.format(this.currValue), INFO);
 
         } else {
             this.maxGain = 0.0;
