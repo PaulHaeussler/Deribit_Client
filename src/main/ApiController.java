@@ -8,6 +8,7 @@ import org.openapitools.client.Configuration;
 import org.openapitools.client.api.*;
 import org.openapitools.client.auth.HttpBasicAuth;
 
+import javax.xml.ws.EndpointReference;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.ArrayList;
@@ -144,6 +145,12 @@ public class ApiController {
         return (LinkedTreeMap) al.get(0);
     }
 
+
+    public ArrayList<LinkedTreeMap> getInstruments(CURRENCY currency, boolean showExpired) throws Exception {
+        LinkedTreeMap tmp = (LinkedTreeMap) marketDataApi.publicGetInstrumentsGet(currency.toString(), "option", showExpired);
+        ArrayList al = (ArrayList) tmp.get("result");
+        return al;
+    }
 
 
     public static TreeMap<Double, Moment> compileTradeList(ApiController api, boolean includeOpen, ApiController.CURRENCY currency) throws Exception {

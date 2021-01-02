@@ -38,11 +38,13 @@ public class Trade extends Movement {
     public Double index;
     public Double diffToStrike;
     public Double ask;
+    public Double bid;
     public Double avgPrem;
     public Double maxPrice;
     public Double priceDiff;
-    public Double currPrice;
+    public Double currValue;
     public Double stopLoss;
+    public Double valIfDelivery;
 
 
     @Override

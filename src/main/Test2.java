@@ -41,8 +41,8 @@ public class Test2 {
             TreeMap<Double, Moment> hb = ApiController.compileTradeList(api, false, ApiController.CURRENCY.BTC);
             TreeMap<Double, Moment> he = ApiController.compileTradeList(api, false, ApiController.CURRENCY.ETH);
 
-            LinkedTreeMap map = api.getBookSummary("BTC-11DEC20-20000-C");
-
+            //LinkedTreeMap map = api.getBookSummary("BTC-11DEC20-20000-C");
+            ArrayList<LinkedTreeMap> m = api.getInstruments(ApiController.CURRENCY.BTC, false);
             System.out.println();
             //t.scheduleAtFixedRate(tt, 5000, 5000);
             //while(true);
