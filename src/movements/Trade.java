@@ -97,11 +97,13 @@ public class Trade extends Movement {
             state = Option.STATE.FILLED;
             opChange += del.change;
         }
-
+        if(openPos > 0){
+            System.currentTimeMillis();
+        }
 
         timeRemaining = state == OPEN ? convertMillisToHMmSs(expiryDate.getTime() - System.currentTimeMillis()) : convertMillisToHMmSs(0);
-
-        change = state == OPEN ? estimateValue(op, openPos, opChange, index, (expiryDate.getTime() - System.currentTimeMillis()), (expiryDate.getTime() - (long)timestamp)) : opChange;
+        change = opChange;
+        //change = state == OPEN ? estimateValue(op, openPos, opChange, index, (expiryDate.getTime() - System.currentTimeMillis()), (expiryDate.getTime() - (long)timestamp)) : opChange;
     }
 
     private static Double estimateValue(Option op, double openPos, double change, double index, long timeRemaining, long initialRuntime){
