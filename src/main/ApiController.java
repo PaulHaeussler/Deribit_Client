@@ -160,7 +160,7 @@ public class ApiController {
         ArrayList<Withdrawal> withdrawals = Withdrawal.parseList(api.getWithdrawalHistory(currency));
 
         Double index = api.getIndex(currency);
-        ArrayList<Trade> trades = Trade.aggregateTrades(options, deliveries, currency, index);
+        ArrayList<Trade> trades = Trade.aggregateTrades(options, deliveries, currency, index, api);
         TreeMap<Double, Movement> sortedMovements = new TreeMap<>();
 
 

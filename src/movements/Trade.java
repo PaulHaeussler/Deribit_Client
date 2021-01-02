@@ -51,6 +51,8 @@ public class Trade extends Movement {
     public Double stopLoss;
     public Double valIfDelivery;
 
+    private ApiController api;
+
 
     @Override
     public double getChange(){
@@ -63,7 +65,8 @@ public class Trade extends Movement {
     }
 
 
-    public Trade(ArrayList<Option> opts, Delivery del, Double index) throws Exception {
+    public Trade(ArrayList<Option> opts, Delivery del, Double index, ApiController API) throws Exception {
+        api = API;
         options = opts;
         delivery = del;
 
@@ -108,10 +111,12 @@ public class Trade extends Movement {
 
         timeRemaining = state == OPEN ? convertMillisToHMmSs(expiryDate.getTime() - System.currentTimeMillis()) : convertMillisToHMmSs(0);
         change = opChange;
-        change = state == OPEN ? estimateValue(op, openPos, opChange, index, (expiryDate.getTime() - System.currentTimeMillis()), (expiryDate.getTime() - (long)timestamp)) : opChange;
+        if (state == OPEN) {
+            estimateValue(op, openPos, opChange, index, (expiryDate.getTime() - System.currentTimeMillis()), (expiryDate.getTime() - (long) timestamp));
+        }
     }
 
-    private Double estimateValue(Option op, double openPos, double change, double index, long timeRemaining, long initialRuntime){
+    private void estimateValue(Option op, double openPos, double change, double index, long timeRemaining, long initialRuntime){
         double diff = 0.0;
 
         if(op.kind == Option.KIND.PUT && op.strikePrice > index){
@@ -146,36 +151,28 @@ public class Trade extends Movement {
 
         this.ask = (Double) map.get("ask_price");
         this.bid = (Double) map.get("bid_price");
-
+        DecimalFormat df = new DecimalFormat("#.00");
+        DecimalFormat df2 = new DecimalFormat("0.00000");
 
         if(openPos < 0){
             this.avgPrem = Math.abs(this.maxGain / this.openPos);
             this.priceDiff = this.ask - this.avgPrem;
             this.currValue = this.priceDiff * this.openPos;
+            Printer.printToLog(this.instrumentName + " diff to strike: " + df.format(this.diffToStrike) + "; MaxPrice: " + df2.format(this.maxPrice) + " - Ask: " + df2.format(this.ask) + "; CurrVal: " + df2.format(this.currValue), INFO);
+
         } else {
             this.maxGain = 0.0;
             this.avgPrem = Math.abs(this.change / this.openPos);
             this.priceDiff = (this.bid - this.avgPrem) * this.openPos;
             this.valIfDelivery = this.diffToStrike * this.openPos;
             this.currValue = Math.max(this.priceDiff, this.valIfDelivery);
+            Printer.printToLog(this.instrumentName + " diff to strike: " + df.format(this.diffToStrike) + "; PaidPrice: " + df2.format(this.change) + " - Bid: " + df2.format(this.bid) + "; CurrVal: " + df2.format(this.currValue), INFO);
         }
 
-        DecimalFormat df = new DecimalFormat("#.00");
-        DecimalFormat df2 = new DecimalFormat("0.00000");
-        Printer.printToLog(this.instrumentName + " diff to strike: " + df.format(this.diffToStrike) + "; PaidPrice: " + df2.format(this.change) + " - Bid: " + df2.format(this.bid) + "; CurrVal: " + df2.format(this.currValue), INFO);
-        
-        double result = btcEffDiff;
-
-        if(result > 0) {
-            double percentRemaining = (double) timeRemaining / (double) initialRuntime;
-            result = (1-percentRemaining) * btcEffDiff;
-        }
-
-        return result;
     }
 
 
-    public static ArrayList<Trade> aggregateTrades(ArrayList<Option> options, ArrayList<Delivery> deliveries, ApiController.CURRENCY currency, Double index) throws Exception {
+    public static ArrayList<Trade> aggregateTrades(ArrayList<Option> options, ArrayList<Delivery> deliveries, ApiController.CURRENCY currency, Double index, ApiController api) throws Exception {
         ArrayList<Trade> results = new ArrayList<>();
         ArrayList<String> processed = new ArrayList<>();
 
@@ -191,7 +188,7 @@ public class Trade extends Movement {
                 if(option.instrumentName.equals(delivery.instrumentName)) del = delivery;
             }
             processed.add(option.instrumentName);
-            results.add(new Trade(opts, del, index));
+            results.add(new Trade(opts, del, index, api));
         }
 
         return results;
