@@ -143,15 +143,22 @@ public class Trade extends Movement {
             this.diffToStrike = this.strikePrice - this.index;
         }
 
-        this.maxGain = 0.0;
-
 
         this.ask = (Double) map.get("ask_price");
         this.bid = (Double) map.get("bid_price");
-        this.avgPrem = Math.abs(this.maxGain / this.openPos);
-        this.priceDiff = (this.bid - this.avgPrem) * this.openPos;
-        this.valIfDelivery = this.diffToStrike * this.openPos;
-        this.currValue = Math.max(this.priceDiff, this.valIfDelivery);
+
+
+        if(openPos < 0){
+            this.avgPrem = Math.abs(this.maxGain / this.openPos);
+            this.priceDiff = this.ask - this.avgPrem;
+            this.currValue = this.priceDiff * this.openPos;
+        } else {
+            this.maxGain = 0.0;
+            this.avgPrem = Math.abs(this.change / this.openPos);
+            this.priceDiff = (this.bid - this.avgPrem) * this.openPos;
+            this.valIfDelivery = this.diffToStrike * this.openPos;
+            this.currValue = Math.max(this.priceDiff, this.valIfDelivery);
+        }
 
         DecimalFormat df = new DecimalFormat("#.00");
         DecimalFormat df2 = new DecimalFormat("0.00000");
