@@ -56,6 +56,9 @@ public class Trade extends Movement {
 
     @Override
     public double getChange(){
+        if(state == OPEN) {
+            return currValue;
+        }
         return change;
     }
 
@@ -117,18 +120,6 @@ public class Trade extends Movement {
     }
 
     private void estimateValue(Option op, double openPos, double change, double index, long timeRemaining, long initialRuntime){
-        double diff = 0.0;
-
-        if(op.kind == Option.KIND.PUT && op.strikePrice > index){
-            diff = op.strikePrice - index;
-        }
-        if(op.kind == Option.KIND.CALL && op.strikePrice < index){
-            diff = index - op.strikePrice;
-        }
-        double liability = diff * openPos;
-        double effectiveDiff = liability + change * index;
-        double btcEffDiff = effectiveDiff / index;
-
         LinkedTreeMap map = null;
         try{
             this.index = api.getIndex(this.currency);
@@ -162,9 +153,10 @@ public class Trade extends Movement {
 
         } else {
             this.maxGain = 0.0;
+            this.diffToStrike = this.diffToStrike * -1;
             this.avgPrem = Math.abs(this.change / this.openPos);
             this.priceDiff = (this.bid - this.avgPrem) * this.openPos;
-            this.valIfDelivery = this.diffToStrike * this.openPos;
+            this.valIfDelivery = this.change + ((this.diffToStrike * this.openPos) / index);
             this.currValue = Math.max(this.priceDiff, this.valIfDelivery);
             Printer.printToLog(this.instrumentName + " diff to strike: " + df.format(this.diffToStrike) + "; PaidPrice: " + df2.format(this.change) + " - Bid: " + df2.format(this.bid) + "; CurrVal: " + df2.format(this.currValue), INFO);
         }
